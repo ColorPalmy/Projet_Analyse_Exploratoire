@@ -58,17 +58,17 @@ names(location.labs) <- c("France","Japan","Australia","China","Spain","United S
 # Plotting
 ggplot(hosts_country_year,
        aes(x = creation_year, y = nb_hosts, group = 1)) +
-  geom_col(aes(fill = "Created per year")) +
-  geom_line(aes(x = creation_year, y = total_hosts, color = "Total per year")) + 
+  geom_col(aes(fill = "Nombre d'inscriptions")) +
+  geom_line(aes(x = creation_year, y = total_hosts, color = "Nombre total d'hôtes")) + 
   facet_wrap(~country,
              nrow = 3,
              scales = "free",
              labeller = labeller(country = location.labs)) +
   scale_color_manual(values = "#d01c8b", name = "") +
   scale_fill_manual(values = "#b8e186", name = "") +
-  labs(title = "Evolution of the number of hosts from 2008 to 2019",
-       x = "Year",
-       y = "Number of hosts") +
+  labs(title = "Evolution du nombre d'hôtes entre 2008 et 2019",
+       x = "Année",
+       y = "Nombre d'hôtes") +
   theme(plot.title = element_text(hjust = 0.5, size = 22),
         strip.text = element_text(size = 18),
         axis.title = element_text(size = 16),
@@ -87,17 +87,17 @@ airbnb$price <- as.numeric(gsub('[$,]', '', airbnb$price))
 ggplot(airbnb[!(airbnb$country=="Japan") & airbnb$accommodates >= 2,],
        aes(x = country, y = price, fill = country)) +
   geom_boxplot(outlier.shape = NA) +
-  scale_y_continuous(name = "Price",
+  scale_y_continuous(name = "Prix par nuit",
                      limits = quantile(airbnb$price, c(0.1, 0.9)),
                      labels = scales::dollar_format()) +
-  scale_x_discrete(name = "City", labels = location.labs) +
+  scale_x_discrete(name = "Ville", labels = location.labs) +
   theme(legend.position = "None",
         axis.text = element_text(size = 24),
         plot.title = element_text(hjust = 0.5, size = 32),
         axis.title = element_text(size = 24),
         axis.title.x = element_text(margin = margin(t = 10)),
         axis.title.y = element_text(margin = margin(r = 10))) +
-  labs(title = "Price distribution") +
+  labs(title = "Distribution du prix par nuit") +
   scale_fill_brewer(palette = "PiYG")
 ggsave("../Graphes/price_dist.pdf",width = 16, height = 9)
 ggsave("./price_dist.png",width = 16, height = 9)
@@ -127,12 +127,16 @@ ggplot(ddply(tmp1,c("country","room_type","stay_duration"), dplyr::summarise, nb
   geom_col(position = position_dodge2(width = 5, preserve = "single")) +
   facet_wrap(~country,
              labeller = labeller(country = location.labs)) +
-  scale_fill_brewer(palette = "PiYG") +
+  scale_fill_brewer(palette = "PiYG",
+                    labels = c("Logement entier",
+                               "Chambre d'hôtel",
+                               "Chambre privée",
+                               "Chambre partagée")) +
   scale_y_continuous(labels = scales::percent) +
-  labs(title = "Proportion of listing type by maximum number of nights and by country",
-       x = "Maximum number of nights",
-       y = "Percentage",
-       fill = "Listing type") +
+  labs(title = "Proportion de chaque type de logement selon le nombre maximal de nuit et la ville",
+       x = "Nombre maximal de nuits",
+       y = "Pourcentage",
+       fill = "Type de logement") +
   theme(axis.text = element_text(size = 16),
         plot.title = element_text(hjust = 0.5, size = 24),
         axis.title = element_text(size = 20),
@@ -153,6 +157,10 @@ if (!file.exists(fil)) download.file(URL, fil)
 nyc_borough <- geojson_read(fil, what="sp")
 nyc_borough_map <- fortify(nyc_borough, region="BoroName")
 
+# New facet label names for listings type
+listings_type.labs <- c("Logement entier","Chambre privée","","")
+names(listings_type.labs) <- c("Entire home/apt","Private room","Hotel room","Shared room")
+
 # Plotting
 ggplot() +
   geom_polygon(data=nyc_borough_map,
@@ -164,7 +172,7 @@ ggplot() +
              size = 0.5) +
   scale_color_brewer(palette = "PiYG",
                      direction = -1,
-                     name = "Price ($)",
+                     name = "Prix ($)",
                      labels = c("<= 50",
                                 "50.1 - 75",
                                 "75.1 - 100",
@@ -176,7 +184,7 @@ ggplot() +
                                 "225.1 - 250",
                                 "> 250")) +
   guides(color = guide_legend(override.aes = list(size = 8))) +
-  labs(title = "Price per night in New York") +
+  labs(title = "Prix par nuit à New York") +
   theme(panel.grid = element_blank(),
         panel.background = element_rect(fill = "snow3"),
         axis.text = element_blank(),
@@ -187,7 +195,7 @@ ggplot() +
         legend.title = element_text(hjust = 0.5, size = 20),
         legend.text = element_text(hjust = 0.5, size = 18),
         plot.title = element_text(hjust = 0.5, size = 24)) +
-  facet_wrap(~room_type)
+  facet_wrap(~room_type, labeller = labeller(room_type = listings_type.labs))
 ggsave("./price_nyc.png",width = 16, height = 9)
 ggsave("../Graphes/price_nyc.pdf",width = 16, height = 9)
 
@@ -220,10 +228,10 @@ ggplot() +
                                          "91% - 95%",
                                          "96% - 100%"))),
                color = "snow3") +
-  scale_fill_manual(name = "Average review rating",
+  scale_fill_manual(name = "Note moyenne",
                     values = c('#8e0152','#c51b7d','#7fbc41','#4d9221','#276419'),
                     na.value = "#fde0ef") +
-  labs(title = "Average rating for entire housings by neighborhoud in New York") +
+  labs(title = "Note moyenne des logements entiers par quartier à New York") +
   theme(panel.grid = element_blank(),
         panel.background = element_rect(fill = "snow2"),
         axis.text = element_blank(),
