@@ -2,6 +2,7 @@
 library(plyr)
 library(tidyverse)
 library(ggplot2)
+library(lubridate)
 library(geojsonio)
 
 ##### Loading and cleaning data #####
@@ -75,7 +76,6 @@ ggplot(hosts_country_year,
         axis.text = element_text(size = 14),
         legend.text = element_text(size = 16))
 ggsave("../Graphes/nb_hosts.pdf",width = 16, height = 9)
-ggsave("./nb_hosts.png",width = 16, height = 9)
 
 
 ##### Graphic 2: Night price distribution by city #####
@@ -100,7 +100,6 @@ ggplot(airbnb[!(airbnb$country=="Japan") & airbnb$accommodates >= 2,],
   labs(title = "Distribution du prix par nuit") +
   scale_fill_brewer(palette = "PiYG")
 ggsave("../Graphes/price_dist.pdf",width = 16, height = 9)
-ggsave("./price_dist.png",width = 16, height = 9)
 
 
 ##### Graphic 3: Percentage of listing type by maximum stay duration and by city #####
@@ -144,7 +143,6 @@ ggplot(ddply(tmp1,c("country","room_type","stay_duration"), dplyr::summarise, nb
         legend.title = element_text(hjust = 0.5, size = 20),
         legend.text = element_text(size = 18))
 ggsave("../Graphes/type_nbnight.pdf",width = 16, height = 9)
-ggsave("./type_nbnight.png",width = 16, height = 9)
 
 
 ##### Graphic 4: Price comparison by borough in New York #####
@@ -196,7 +194,6 @@ ggplot() +
         legend.text = element_text(hjust = 0.5, size = 18),
         plot.title = element_text(hjust = 0.5, size = 24)) +
   facet_wrap(~room_type, labeller = labeller(room_type = listings_type.labs))
-ggsave("./price_nyc.png",width = 16, height = 9)
 ggsave("../Graphes/price_nyc.pdf",width = 16, height = 9)
 
 
@@ -241,5 +238,4 @@ ggplot() +
         legend.title = element_text(hjust = 0.5, size = 24),
         legend.text = element_text(size = 22),
         plot.title = element_text(hjust = 0.5, size = 31))
-ggsave("./ratings_nyc.png",width = 16, height = 9)
 ggsave("../Graphes/ratings_nyc.pdf",width = 16, height = 9)
